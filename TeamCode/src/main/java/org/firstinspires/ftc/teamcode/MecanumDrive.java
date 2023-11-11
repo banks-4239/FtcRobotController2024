@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -93,8 +94,8 @@ public final class MecanumDrive {
     public final AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
 
-    public final DcMotorEx leftFront, rightFront, leftBack, rightBack, intake /*,arm*/;
-
+    public final DcMotorEx leftFront, rightFront, leftBack, rightBack, intake, leftSlide, rightSlide;
+    public final Servo scoringServo;
     public final VoltageSensor voltageSensor;
 
     public final IMU imu;
@@ -181,8 +182,9 @@ public final class MecanumDrive {
         leftBack = hardwareMap.get(DcMotorEx.class, "bl");
         rightBack = hardwareMap.get(DcMotorEx.class, "br");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
-        //arm = hardwareMap.get(DcMotorEx.class, "arm");
-
+        leftSlide = hardwareMap.get(DcMotorEx.class, "lslide");
+        rightSlide = hardwareMap.get(DcMotorEx.class, "rslide");
+        scoringServo = hardwareMap.get(Servo.class,"ss");
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.REVERSE);

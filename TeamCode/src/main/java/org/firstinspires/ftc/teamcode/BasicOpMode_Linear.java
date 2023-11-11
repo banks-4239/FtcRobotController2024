@@ -51,7 +51,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.RobotHardware;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-
+//
 @TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
 //@Disabled
 public class BasicOpMode_Linear extends LinearOpMode {
@@ -85,32 +85,41 @@ public class BasicOpMode_Linear extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            boolean intakeIn = gamepad1.right_bumper;
-            boolean intakeOut = gamepad1.left_bumper;
-
+            boolean slideUp= gamepad1.dpad_up;
+            boolean slideDown=gamepad1.dpad_down;
+         robot.leftFront.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x);
+        robot.rightFront.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.right_stick_x);
+         robot.leftBack.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x);
+          robot.rightBack.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.right_stick_x);
             // Setup a variable for each drive wheel to save power level for telemetry
        double forward = gamepad1.left_stick_y;
 
 
-            telemetry.addData("Hello Wolrd!", "");
-            telemetry.update();
-
             // Intake button
-            if (intakeIn) {
-                telemetry.addData("Hello Wolrd!", "");
-                telemetry.update();
-                robot.intake.setPower(1);
-            } else if (intakeOut) {
-                robot.intake.setPower(-1);
-            } else {
-                robot.intake.setPower(0);
+            robot.intake.setPower((gamepad1.right_trigger-gamepad1.left_trigger)*2);
+            if (slideUp){
+
+                robot.rightSlide.setPower(1);
+            } else if(slideDown){
+
+                robot.rightSlide.setPower(-1);
+            }else{
+
+                robot.rightSlide.setPower(0);
             }
-
-
-
+            if (gamepad1.a){
+                robot.scoringServo.setPosition(0.5);
+            }else{
+                robot.scoringServo.setPosition(0);
+            }
             // Show the elapsed game time and wheel power.
            // telemetry.addData("Status", "Run Time: " + runtime.toString());
-           // telemetry.addData("Motors", "left (%.2f), right (%.2f)", frontLeftPower, frontRightPower);
+
+
+
+
+
+            // telemetry.addData("Motors", "left (%.2f), right (%.2f)", frontLeftPower, frontRightPower);
 
             telemetry.addData("Localizer: ", robot.localizer);
             telemetry.update();
