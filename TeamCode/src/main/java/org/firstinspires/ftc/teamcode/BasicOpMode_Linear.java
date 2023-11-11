@@ -52,23 +52,23 @@ import org.firstinspires.ftc.robotcontroller.external.samples.RobotHardware;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 //
-@TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
+@TeleOp(name = "Basic: Linear OpMode", group = "Linear OpMode")
 //@Disabled
 public class BasicOpMode_Linear extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        MecanumDrive robot = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
+        MecanumDrive robot = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
         /* double forward = gamepad1.left_stick_y;
         double strafe = ;
         double turn = ; */
-
 
 
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -76,47 +76,42 @@ public class BasicOpMode_Linear extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
 
 
-
-
-
-         // Wait for the game to start (driver presses PLAY)
+        // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            boolean slideUp= gamepad1.dpad_up;
-            boolean slideDown=gamepad1.dpad_down;
-         robot.leftFront.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x);
-        robot.rightFront.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.right_stick_x);
-         robot.leftBack.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x);
-          robot.rightBack.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.right_stick_x);
+            boolean slideUp = gamepad1.dpad_up;
+            boolean slideDown = gamepad1.dpad_down;
+            robot.leftFront.setPower (-gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.right_stick_x);
+            robot.rightFront.setPower(-gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x);
+            robot.leftBack.setPower  (-gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x);
+            robot.rightBack.setPower (-gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.right_stick_x);
             // Setup a variable for each drive wheel to save power level for telemetry
-       double forward = gamepad1.left_stick_y;
+            double forward = gamepad1.left_stick_y;
 
 
             // Intake button
-            robot.intake.setPower((gamepad1.right_trigger-gamepad1.left_trigger)*2);
-            if (slideUp){
-
-                robot.rightSlide.setPower(1);
-            } else if(slideDown){
+            robot.intake.setPower((gamepad1.right_trigger - gamepad1.left_trigger) * 2);
+            if (slideUp) {
 
                 robot.rightSlide.setPower(-1);
-            }else{
+            } else if (slideDown) {
+
+                robot.rightSlide.setPower(1);
+            } else {
 
                 robot.rightSlide.setPower(0);
             }
-            if (gamepad1.a){
-                robot.scoringServo.setPosition(0.5);
-            }else{
+
+            if (gamepad1.a) {
+                robot.scoringServo.setPosition(0.99);
+            } else {
                 robot.scoringServo.setPosition(0);
             }
             // Show the elapsed game time and wheel power.
-           // telemetry.addData("Status", "Run Time: " + runtime.toString());
-
-
-
+            // telemetry.addData("Status", "Run Time: " + runtime.toString());
 
 
             // telemetry.addData("Motors", "left (%.2f), right (%.2f)", frontLeftPower, frontRightPower);

@@ -33,6 +33,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -178,16 +179,16 @@ public final class MecanumDrive {
         }
 
         leftFront = hardwareMap.get(DcMotorEx.class, "fl");
-        rightFront = hardwareMap.get(DcMotorEx.class, "fr");
-        leftBack = hardwareMap.get(DcMotorEx.class, "bl");
+        rightFront = hardwareMap.get(DcMotorEx.class, "bl");
+        leftBack = hardwareMap.get(DcMotorEx.class, "fr");
         rightBack = hardwareMap.get(DcMotorEx.class, "br");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         leftSlide = hardwareMap.get(DcMotorEx.class, "lslide");
         rightSlide = hardwareMap.get(DcMotorEx.class, "rslide");
         scoringServo = hardwareMap.get(Servo.class,"ss");
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
