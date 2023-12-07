@@ -82,11 +82,11 @@ public final class TuningOpModes {
                         hardwareMap.getAll(LynxModule.class),
                         Arrays.asList(
                                 md.leftFront,
-                                md.rightFront
+                                md.leftBack
                         ),
                         Arrays.asList(
-                                md.rightBack,
-                                md.leftBack
+                                md.rightFront,
+                                md.rightBack
                         ),
                         leftEncs,
                         rightEncs,

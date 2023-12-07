@@ -29,9 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -53,10 +55,19 @@ import org.firstinspires.ftc.robotcontroller.external.samples.RobotHardware;
  */
 //
 @TeleOp(name = "Basic: Linear OpMode", group = "Linear OpMode")
+@Config
 //@Disabled
 public class BasicOpMode_Linear extends LinearOpMode {
 
     // Declare OpMode members.
+    public static double ssStartPosition=0.2;
+    public static double ssScorePosition=0.9;
+    public static int slidesUp=100;
+            public static int slidesDown=0;
+
+
+
+
     private ElapsedTime runtime = new ElapsedTime();
 
     @Override
@@ -79,44 +90,61 @@ public class BasicOpMode_Linear extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        robot.leftSlide.setPower(Math.abs(2));
+        robot.rightSlide.setPower(Math.abs(2));
+        robot.leftSlide.setTargetPosition(slidesDown);
+        robot.rightSlide.setTargetPosition(slidesDown);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            boolean slideUp = gamepad1.dpad_up;
-            boolean slideDown = gamepad1.dpad_down;
-            robot.leftFront.setPower (-gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.right_stick_x);
+            robot.leftFront.setPower(-gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.right_stick_x);
             robot.rightFront.setPower(-gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x);
-            robot.leftBack.setPower  (-gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x);
-            robot.rightBack.setPower (-gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.right_stick_x);
+            robot.leftBack.setPower(-gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.right_stick_x);
+            robot.rightBack.setPower(-gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x);
             // Setup a variable for each drive wheel to save power level for telemetry
             double forward = gamepad1.left_stick_y;
 
-
             // Intake button
-            robot.intake.setPower((gamepad1.right_trigger - gamepad1.left_trigger) * 2);
-            if (slideUp) {
+            robot.intake.setPower((gamepad1.right_trigger - gamepad1.left_trigger) * 8);
+            if (gamepad2.dpad_up) {
+                robot.leftSlide.setTargetPosition(slidesUp);
+                robot.rightSlide.setTargetPosition(slidesUp);
 
-                robot.rightSlide.setPower(-1);
-            } else if (slideDown) {
+            } else if (gamepad2.dpad_down) {
+                robot.leftSlide.setTargetPosition(slidesDown);
+                robot.rightSlide.setTargetPosition(slidesDown);
 
-                robot.rightSlide.setPower(1);
+                robot. leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
             } else {
-
-                robot.rightSlide.setPower(0);
+                robot.leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
-
-            if (gamepad1.a) {
-                robot.scoringServo.setPosition(0.99);
+            if (gamepad2.a) {
+                robot.scoringServo.setPosition(ssScorePosition);
             } else {
-                robot.scoringServo.setPosition(0);
+                robot.scoringServo.setPosition(ssStartPosition);
             }
+            //AIRPLANE CODE!!!
+            // if (gamepad1.y) {
+//              robot.shooterMotor.setPower(1);
+//              sleep(1000);
+//              robot.shooterServo.setPosition(0.3);
+//            } else {
+//                robot.shooterMotor.setPower(0);
+//              //robot.shooterServo.setPosition(0);
+//            }
+
             // Show the elapsed game time and wheel power.
             // telemetry.addData("Status", "Run Time: " + runtime.toString());
 
 
             // telemetry.addData("Motors", "left (%.2f), right (%.2f)", frontLeftPower, frontRightPower);
 
-            telemetry.addData("Localizer: ", robot.localizer);
+            telemetry.addData("leftstickY", gamepad1.left_stick_y);
+            telemetry.addData("leftstickX", gamepad1.left_stick_x);
+            telemetry.addData("rightstickX", gamepad1.right_stick_x);
             telemetry.update();
         }
     }

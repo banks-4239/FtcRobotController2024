@@ -21,6 +21,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -42,6 +43,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
  * the sample regions over the first 3 stones.
  */
 @TeleOp
+@Disabled
 public class ColorDetection extends LinearOpMode
 {
     OpenCvCamera camera;
@@ -119,11 +121,11 @@ public class ColorDetection extends LinearOpMode
         /*
          * The core values which define the location and size of the sample regions
          */
-        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(400,480);
+        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(185,590);
         static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(700,480);
-        static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1000,480);
-        static final int REGION_WIDTH = 100;
-        static final int REGION_HEIGHT = 100;
+        static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1150,5805);
+        static final int REGION_WIDTH = 50;
+        static final int REGION_HEIGHT = 50;
 
         /*
          * Points which actually define the sample region rectangles, derived from above values
@@ -207,8 +209,7 @@ public class ColorDetection extends LinearOpMode
         }
 
         @Override
-        public Mat processFrame(Mat input)
-        {
+        public Mat processFrame(Mat input) {
             /*
              * Overview of what we're doing:
              *
@@ -304,7 +305,7 @@ public class ColorDetection extends LinearOpMode
              * Now that we found the max, we actually need to go and
              * figure out which sample region that value was from
              */
-            if(max == avg1) // Was it from region 1?
+            if (max == avg1) // Was it from region 1?
             {
                 position = TeamElementPosition.LEFT; // Record our analysis
 
@@ -318,8 +319,7 @@ public class ColorDetection extends LinearOpMode
                         region1_pointB, // Second point which defines the rectangle
                         GREEN, // The color the rectangle is drawn in
                         -1); // Negative thickness means solid fill
-            }
-            else if(max == avg2) // Was it from region 2?
+            } else if (max == avg2) // Was it from region 2?
             {
                 position = TeamElementPosition.CENTER; // Record our analysis
 
@@ -333,8 +333,7 @@ public class ColorDetection extends LinearOpMode
                         region2_pointB, // Second point which defines the rectangle
                         GREEN, // The color the rectangle is drawn in
                         -1); // Negative thickness means solid fill
-            }
-            else if(max == avg3) // Was it from region 3?
+            } else if (max == avg3) // Was it from region 3?
             {
                 position = TeamElementPosition.RIGHT; // Record our analysis
 

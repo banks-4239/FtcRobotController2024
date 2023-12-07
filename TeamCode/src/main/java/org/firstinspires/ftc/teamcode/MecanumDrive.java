@@ -24,6 +24,7 @@ import com.acmerobotics.roadrunner.Twist2dDual;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Encoder;
+import com.acmerobotics.roadrunner.ftc.FeedforwardFactory;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.LynxFirmware;
 import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
@@ -50,14 +51,15 @@ import java.util.List;
 public final class MecanumDrive {
     public static class Params {
         // drive model parameters
-        public double inPerTick = 0;
-        public double lateralInPerTick = 1;
-        public double trackWidthTicks = 0;
+        public double inPerTick = 0.000889134459359;
+
+        public double lateralInPerTick = 0.0006102711366538636;
+        public double trackWidthTicks = 27980.844370387087;
 
         // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0;
-        public double kA = 0;
+        public double kS = 1.4352100086823056;
+        public double kV = 0.00010334305322371946;
+        public double kA = 0.00000005;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -83,7 +85,17 @@ public final class MecanumDrive {
     public final MecanumKinematics kinematics = new MecanumKinematics(
             PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
 
-    public final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS, PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
+    public final FeedforwardFactory feedforward = new FeedforwardFactory() {
+        @NonNull
+        @Override
+        public MotorFeedforward make() {
+            return new MotorFeedforward(PARAMS.kS,
+            PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
+        }
+    };
+
+//    public final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS,
+//            PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
 
     public final TurnConstraints defaultTurnConstraints = new TurnConstraints(
             PARAMS.maxAngVel, -PARAMS.maxAngAccel, PARAMS.maxAngAccel);
@@ -178,18 +190,25 @@ public final class MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "fl");
-        rightFront = hardwareMap.get(DcMotorEx.class, "bl");
-        leftBack = hardwareMap.get(DcMotorEx.class, "fr");
-        rightBack = hardwareMap.get(DcMotorEx.class, "br");
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        rightBack = hardwareMap.get(DcMotorEx.class, "br");//control1
+        leftBack = hardwareMap.get(DcMotorEx.class, "bl");//exp1
+        rightFront = hardwareMap.get(DcMotorEx.class, "fr");//control0
+        leftFront = hardwareMap.get(DcMotorEx.class, "fl");//exp0
+        intake = hardwareMap.get(DcMotorEx.class, "intake");//
         leftSlide = hardwareMap.get(DcMotorEx.class, "lslide");
         rightSlide = hardwareMap.get(DcMotorEx.class, "rslide");
         scoringServo = hardwareMap.get(Servo.class,"ss");
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.FORWARD);
+        leftFront.setDirection (DcMotor.Direction.REVERSE);//effectsitself...weird
+        rightFront.setDirection(DcMotor.Direction.FORWARD);//effectsBackLeft
+        leftBack.setDirection  (DcMotor.Direction.REVERSE);//effectsBackRight
+        rightBack.setDirection (DcMotor.Direction.FORWARD);//effectsFrontRight
+        leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -219,9 +238,9 @@ public final class MecanumDrive {
         }
 
         leftFront.setPower(wheelVels.leftFront.get(0) / maxPowerMag);
-        rightFront.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
-        leftBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
-        rightBack.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
+        rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
+        leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
+        rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
     }
 
     public final class FollowTrajectoryAction implements Action {
@@ -276,6 +295,9 @@ public final class MecanumDrive {
 
             MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
             double voltage = voltageSensor.getVoltage();
+
+            final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS,
+                    PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
             leftFront.setPower(feedforward.compute(wheelVels.leftFront) / voltage);
             rightFront.setPower(feedforward.compute(wheelVels.leftBack) / voltage);
             leftBack.setPower(feedforward.compute(wheelVels.rightBack) / voltage);
@@ -357,6 +379,8 @@ public final class MecanumDrive {
 
             MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
             double voltage = voltageSensor.getVoltage();
+            final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS,
+                    PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
             leftFront.setPower(feedforward.compute(wheelVels.leftFront) / voltage);
             rightFront.setPower(feedforward.compute(wheelVels.leftBack) / voltage);
             leftBack.setPower(feedforward.compute(wheelVels.rightBack) / voltage);
